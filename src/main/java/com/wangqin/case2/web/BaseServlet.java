@@ -1,4 +1,4 @@
-package com.wangqin.case2.service;
+package com.wangqin.case2.web;
 
 import com.wangqin.case2.utils.ServletUtil;
 

@@ -63,4 +63,16 @@ public class AddUser implements Serializable {
     public void setRoleIds(List<String> roleIds) {
         this.roleIds = roleIds;
     }
+
+    @Override
+    public String toString() {
+        return "AddUser{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", email='" + email + '\'' +
+                ", remark='" + remark + '\'' +
+                ", roleIds=" + roleIds +
+                '}';
+    }
 }
