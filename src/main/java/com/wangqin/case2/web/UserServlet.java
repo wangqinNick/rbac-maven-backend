@@ -1,6 +1,9 @@
 package com.wangqin.case2.web;
 
 import com.wangqin.case2.pojo.vo.AddUser;
+import com.wangqin.case2.pojo.vo.PageResult;
+import com.wangqin.case2.pojo.vo.QueryPageBean;
+import com.wangqin.case2.pojo.vo.Result;
 import com.wangqin.case2.service.UserService;
 import com.wangqin.case2.service.UserServiceImpl;
 import com.wangqin.case2.utils.BaseController;
@@ -29,20 +32,40 @@ public class UserServlet extends BaseServlet {
     }
 
     public void add(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        LOGGER.info("收到添加用户请求");
         AddUser user = BaseController.parseJSON2Object(request, AddUser.class);
-
         UserService userService = new UserServiceImpl();
-        boolean result = userService.add(user);
-        System.out.println(user);
-        BaseController.printResult(response, result);
+//        Result result = userService.add(user);
+//        System.out.println(user);
+//        BaseController.printResult(response, result);
     }
 
     public void update(HttpServletRequest request, HttpServletResponse response) {
         System.out.println("update");
     }
 
-    public void findAll(HttpServletRequest request, HttpServletResponse response) {
-        System.out.println("findAll");
+    public void pagingQuery(HttpServletRequest request, HttpServletResponse response) {
+        // 1. 将前端提交的参数(当前页码, 每页条数)封装到VO实体类QueryPageBean中
+        // 要求前端JSON的key和JavaBean中的成员变量一致
+        try {
+            LOGGER.info("分页查询...");
+            QueryPageBean queryPageBean = BaseController.parseJSON2Object(request, QueryPageBean.class);
+            // 2. 创建业务层对象
+            UserService userService = new UserServiceImpl();
+            // 3. 调用业务层方法, 将结果封装到PageResult
+            PageResult pageResult = userService.pagingQuery(queryPageBean);
+            // 4. 创建Result对象, 继续封装
+            Result result = new Result(true, "查询成功", pageResult);
+            // 5. 将result转化为JSON之后响应给前端
+            BaseController.printResult(response, result);
+        } catch (IOException e) {
+            LOGGER.warn(e.getMessage());
+            // 6. 创建Result对象失败
+            Result result = new Result(false, "查询失败");
+            try {
+                BaseController.printResult(response, result);
+            } catch (IOException ex) {
+                LOGGER.error(ex.getMessage());
+            }
+        }
     }
 }

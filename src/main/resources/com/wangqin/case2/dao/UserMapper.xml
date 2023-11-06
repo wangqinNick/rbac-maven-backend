@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 通过名称空间，绑定Mapper接口 -->
+<mapper namespace="com.wangqin.case2.dao.UserMapper">
+    <!--自定义结果映射： 配置多表查询结果和Pojo类的映射 -->
+    <resultMap id="pagingQueryResultMap" type="User" autoMapping="true">
+        <id column="id" property="id"/>
+        <result column="username" property="username"/>
+
+        <collection property="roles" autoMapping="true" ofType="Role">
+            <id column="rid" property="id"/>
+        </collection>
+    </resultMap>
+    <!-- 根据用户id，查询用户信息及用户所下订单信息 （多表查询）-->
+
+    <select id="pagingQuery" resultMap="pagingQueryResultMap">
+        SELECT t_user.*,
+               t_role.id rid,
+               t_role.name,
+               t_role.keyword,
+               t_role.description
+        FROM (SELECT * FROM t_user LIMIT #{startIndex}, #{pageSize}) t_user,
+             t_user_role,
+             t_role
+        WHERE t_user.id = t_user_role.user_id
+          AND t_role.id = t_user_role.role_id
+        ORDER BY user_id
+    </select>
+</mapper>
