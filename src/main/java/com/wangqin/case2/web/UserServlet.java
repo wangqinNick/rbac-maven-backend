@@ -1,9 +1,12 @@
 package com.wangqin.case2.web;
 
+import com.alibaba.fastjson.JSONArray;
 import com.wangqin.case2.pojo.vo.AddUser;
 import com.wangqin.case2.pojo.vo.PageResult;
 import com.wangqin.case2.pojo.vo.QueryPageBean;
 import com.wangqin.case2.pojo.vo.Result;
+import com.wangqin.case2.service.RoleService;
+import com.wangqin.case2.service.RoleServiceImp;
 import com.wangqin.case2.service.UserService;
 import com.wangqin.case2.service.UserServiceImpl;
 import com.wangqin.case2.utils.BaseController;
@@ -39,6 +42,15 @@ public class UserServlet extends BaseServlet {
             Result result;
             if (addResult) {
                 result = new Result(true, "添加成功");
+                // 赋予用户角色
+                RoleService roleService = new RoleServiceImp();
+                int userId = user.getId();
+                String roleIds = user.getRoleIds().get(0); // "["2","1","3"]"
+                JSONArray jsonArray = JSONArray.parseArray(roleIds);
+                for (Object element : jsonArray) {
+                    int intValue = Integer.parseInt(element.toString());
+                    roleService.assign(userId, intValue);
+                }
             } else {
                 result = new Result(false, "用户已存在, 添加失败");
             }

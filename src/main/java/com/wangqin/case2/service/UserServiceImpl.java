@@ -30,10 +30,8 @@ public class UserServiceImpl implements UserService {
             User u = mapper.query(user);
             if (u == null) {
                 mapper.add(user);
-                LOGGER.info("用户添加成功");
                 return true;
             } else {
-                LOGGER.info("用户添加失败");
                 return false;
             }
         } finally {
