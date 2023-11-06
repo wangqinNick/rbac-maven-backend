@@ -31,12 +31,28 @@ public class UserServlet extends BaseServlet {
         System.out.println("delete");
     }
 
-    public void add(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        AddUser user = BaseController.parseJSON2Object(request, AddUser.class);
-        UserService userService = new UserServiceImpl();
-//        Result result = userService.add(user);
-//        System.out.println(user);
-//        BaseController.printResult(response, result);
+    public void add(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            AddUser user = BaseController.parseJSON2Object(request, AddUser.class);
+            UserService userService = new UserServiceImpl();
+            boolean addResult = userService.add(user);
+            Result result;
+            if (addResult) {
+                result = new Result(true, "添加成功");
+            } else {
+                result = new Result(false, "用户已存在, 添加失败");
+            }
+            BaseController.printResult(response, result);
+        } catch (IOException e) {
+            LOGGER.warn(e.getMessage());
+            // 6. 创建Result对象失败
+            Result result = new Result(false, "添加失败");
+            try {
+                BaseController.printResult(response, result);
+            } catch (IOException ex) {
+                LOGGER.error(ex.getMessage());
+            }
+        }
     }
 
     public void update(HttpServletRequest request, HttpServletResponse response) {
@@ -47,7 +63,6 @@ public class UserServlet extends BaseServlet {
         // 1. 将前端提交的参数(当前页码, 每页条数)封装到VO实体类QueryPageBean中
         // 要求前端JSON的key和JavaBean中的成员变量一致
         try {
-            LOGGER.info("分页查询...");
             QueryPageBean queryPageBean = BaseController.parseJSON2Object(request, QueryPageBean.class);
             // 2. 创建业务层对象
             UserService userService = new UserServiceImpl();
